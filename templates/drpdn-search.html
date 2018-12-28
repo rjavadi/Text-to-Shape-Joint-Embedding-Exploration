@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>search-by-dropdown</title>
+    <link rel="stylesheet" href="../static/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/css/styles.css">
+</head>
+
+<body>
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <h2> Select your features:</h2>
+    </div>
+    <form class="form-row" action="/search-drop" method="post" id="search-form">
+
+        <div class="col"><select class="form-control" name="objectType" id="objectType">
+            <optgroup label="Object Type">
+                <option value="" selected>Select Object Type...</option>
+                <option value="chair">Chair</option>
+                <option value="table">Table</option>
+            </optgroup>
+        </select></div>
+
+        <div class="col"><select class="form-control" name="color" id="color">
+            <optgroup label="Color">
+                <option value="" selected="">Select Color..</option>
+                <option value="beige">Beige</option>
+                <option value="black">Black</option>
+                <option value="blue">Black</option>
+                <option value="brown">Brown</option>
+                <option value="green">Green</option>
+                <option value="purple">Purple</option>
+                <option value="orange">Orange</option>
+                <option value="red">Red</option>
+                <option value="yellow">Yellow</option>
+                <option value="white">White</option>
+            </optgroup>
+        </select></div>
+        <div class="col"><select class="form-control" name="material" id="material">
+            <optgroup label="Material">
+                <option value="" selected="">Select Material...</option>
+                <option value="fabric">Fabric</option>
+                <option value="glass">Glass</option>
+                <option value="leather">Leather</option>
+                <option value="metal">Metal</option>
+                <option value="plastic">Plastic</option>
+                <option value="wood">Wood</option>
+            </optgroup>
+        </select></div>
+
+        <div class="col"><select class="form-control" name="shape" id="shape">
+            <optgroup label="Shape">
+                <option value="" selected="">Select Shape...</option>
+                <option value="round">Round</option>
+                <option value="rectangle">Rectangle</option>
+            </optgroup>
+        </select></div>
+        <div class="col-2"><select class="form-control" name="style" id="style">
+            <optgroup label="Style">
+                <option value="" selected="">Select Style...</option>
+                <option value="modern">Modern</option>
+                <option value="traditional">Traditional</option>
+                <option value="artistic">Artistic</option>
+                <option value="artistic">Classic</option>
+
+            </optgroup>
+        </select></div>
+            <button type="submit" id="submit-btn" class="btn btn-primary">Go!</button>
+    </form>
+
+    <div class="row justify-content-center">
+        <h5><a href="/search">I want to enter my own description</a></h5>
+    </div>
+
+    <script src="../static/js/jquery.min.js"></script>
+    <script src="../static/bootstrap/js/bootstrap.min.js"></script>
+</div>
+</body>
+
+</html>

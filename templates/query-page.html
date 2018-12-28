@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+    {% for message in get_flashed_messages() %}
+        <div class="ui-state-error-text">{{ message }}</div>
+    {% endfor %}
+    <div class="row d-flex align-self-center">
+        <div class="col col-lg-1"></div>
+        <div class="col col-lg-10">
+            <form action="/result" method="post" id="search-box" class="col-12">
+                <div class="form-group">
+                    <div class="class-lg-8">
+                        <label for="query" class="col-lg-3" style="display:inline-block;border-radius:10px;">enter
+                            search query</label>
+                        <input class="form-control col-lg-7" type="text" name="query" id="query"
+                               style="display:inline-block;"></div>
+                    <div class="form-row">
+                        <div class="col justify-content-center text-center" style="align-content:center;">
+                            <button class="btn btn-primary" type="submit"
+                                    style="margin-top:10px;margin-left:auto;margin-right:auto;">Go!
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col col-lg-1"></div>
+    </div>
+{% endblock %}
+

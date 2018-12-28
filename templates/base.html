@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+        <meta charset="UTF-8">
+        <title>{% block title %} - Text to Shape Exploration</title>{% endblock %}
+        <link rel="stylesheet" href="../static/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="../static/css/styles.css">
+    {% endblock %}
+</head>
+
+<body>
+<div class="container h-100">{% block content %}{% endblock %}</div>
+<script src="../static/js/jquery.min.js"></script>
+    <script src="../static/bootstrap/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <table class="table table-bordered table-striped">
+        <thead class="thead-dark">
+        <tr>
+            <th>Index</th>
+            <th>Model ID</th>
+            <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for id, descr in captions.items() %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td><a href={{ "https://3dwarehouse.sketchup.com/model/" + id  }}>{{ id }}</a></td>
+                <td>{{ descr }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+
+{% endblock %}
