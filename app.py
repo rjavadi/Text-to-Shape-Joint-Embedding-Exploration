@@ -11,6 +11,7 @@ from flask import (
 import pandas as pd
 import os
 from difflib import SequenceMatcher
+from sklearn.feature_extraction.text import CountVectorizer
 
 app = Flask(__name__)
 
