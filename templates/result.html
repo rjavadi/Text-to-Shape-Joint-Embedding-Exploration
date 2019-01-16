@@ -14,7 +14,7 @@
         {% for id, descr in captions.items() %}
             <tr>
                 <td>{{ loop.index }}</td>
-                <td><a href={{ " http://dovahkiin.stanford.edu/scene-toolkit/assets/download/3dw/image/" + id  + "/rotatingImage"}}>{{ id }}</a></td>
+                <td><img src="{{"http://dovahkiin.stanford.edu/scene-toolkit/assets/download/3dw/image/" + id  + "/rotatingImage"}}"  width="100" height="100"></td>
                 <td>{{ descr }}</td>
             </tr>
         {% endfor %}

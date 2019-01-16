@@ -1,1 +1,3 @@
-F:\DL-code\text2shape-data\captions.csv
+[DEFAULT]
+CaptionsFilePath = F:\DL-code\text2shape-data\captions.csv
+CaptionsDoc2VecModel = .\captions_emb.doc2vec

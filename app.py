@@ -7,11 +7,12 @@ import os.path
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for
 )
+import doc2vec
 
 import pandas as pd
 import os
 from difflib import SequenceMatcher
-from sklearn.feature_extraction.text import CountVectorizer
+import configparser
 
 app = Flask(__name__)
 
@@ -25,8 +26,9 @@ def get_file_path():
         raise FileNotFoundError(
             errno.ENOENT, os.strerror(errno.ENOENT), CONFIG_FILE_PATH)
 
-    conf = open(CONFIG_FILE_PATH, mode='r')
-    file_path = conf.readline()
+    config = configparser.ConfigParser()
+    config.read('config.txt')
+    file_path = config['DEFAULT']['CaptionsFilePath']
     if not os.path.isfile(CONFIG_FILE_PATH):
         raise FileNotFoundError(
             errno.ENOENT, os.strerror(errno.ENOENT), file_path)
@@ -93,22 +95,12 @@ def find_caption(query):
     #                            index_col=['id'])
     captions_df = pd.read_csv(file_path,
                               index_col=['id'])
+    result_dict = {}
+    similars = doc2vec.find_similars(query)
+    for id, score in similars:
+        model_id = captions_df.loc[int(id[5:]), 'modelId']
+        description = captions_df.loc[int(id[5:]), 'description']
+        result_dict.update({model_id: description})
 
-    print("TODO: file found")
-    # return captions_df.loc[int(id)]
-    captions_df['ratio'] = captions_df.apply(lambda row: calculate_ratio(row, query), axis=1)
-    sorted_df = captions_df.sort_values('ratio', ascending=False).head(10)
-    cap_dict = dict(zip(sorted_df['modelId'], sorted_df['description']))
-    return cap_dict
-
-
-def calculate_ratio(row, query):
-    if type(row['description']) is str:
-        return SequenceMatcher(None, query, row['description']).ratio()
-
-
-def dummy_cap():
-    return {'8806336': 'Brown wood picnic table.',
-            '6784346': 'can be used to keep things.', '7658344': 'This looks like a brown picnic table',
-            '1122345': 'narrow, wooden high table',
-            '4379243': 'An old fashion big brown color chair with thick arms and very thin back.'}
+    print(similars)
+    return result_dict
