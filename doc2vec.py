@@ -30,6 +30,7 @@ def read_corpus(tokens_only=False):
             id = captions_df['id'].iat[i]
             yield TaggedDocument(simple_preprocess(line), ['SENT_%d' %id])
 
+
 def train_and_save():
     documents = list(read_corpus())
     model = Doc2Vec(documents, vector_size=64, window=1, min_count=1,   workers=8, epochs=50, train_lbls=False)
@@ -43,4 +44,4 @@ def find_similars(query):
     return model.docvecs.most_similar([vec_emb])
 
 
-
+train_and_save()
