@@ -25,11 +25,15 @@ wheels/
 *.egg
 MANIFEST
 
+main/
+
 # PyInstaller
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
 *.spec
+*.csv
+*.doc2vec
 
 # Installer logs
 pip-log.txt

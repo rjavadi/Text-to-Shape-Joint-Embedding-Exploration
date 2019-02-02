@@ -18,6 +18,18 @@ def get_captions_path():
     return config['DEFAULT']['CaptionsFilePath']
 
 
+def get_embedding_path():
+    config = configparser.ConfigParser()
+    config.read('config.txt')
+    return config['DEFAULT']['EmbeddingsCsv']
+
+
+def get_labels_path():
+    config = configparser.ConfigParser()
+    config.read('config.txt')
+    return config['DEFAULT']['LabelsCsv']
+
+
 def read_corpus(tokens_only=False):
     captions_df = pd.read_csv(get_captions_path())
     captions_limit = 75358
@@ -44,4 +56,22 @@ def find_similars(query):
     return model.docvecs.most_similar([vec_emb])
 
 
-train_and_save()
+def create_embedding_datafram():
+    model = Doc2Vec.load(get_model_path())
+    docs = model.docvecs.vectors_docs
+
+    captions_df = pd.read_csv(get_captions_path(), usecols=['category'])
+
+    top_1000keys = list(model.docvecs.doctags.keys())[:1000]
+    labels_df = pd.DataFrame(captions_df['category'].iloc[:1000])
+
+    docs_df = pd.DataFrame(docs[:1000])
+    docs_df.to_csv(get_embedding_path(), index=False)
+
+    labels_df.to_csv(get_labels_path(), index=False)
+    print('labels and embeddings csv created.')
+
+
+# train_and_save()
+create_embedding_datafram()
+

@@ -1,23 +1,36 @@
+import configparser
 import errno
-
-from flask import Flask
-import argparse
+import os
 import os.path
 
+import dash
+import pandas as pd
+from flask import Flask
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for
+    render_template, request
 )
+from local import local_callbacks, local_layout
+
 import doc2vec
 
-import pandas as pd
-import os
-from difflib import SequenceMatcher
-import configparser
-
-app = Flask(__name__)
+server = Flask(__name__)
+app_dash = dash.Dash(__name__, server=server)
 
 print("name: ", __name__)
 
+external_css = [
+    "https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css",
+    "https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css",
+    "//fonts.googleapis.com/css?family=Raleway:400,300,600",
+    "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+]
+
+for css in external_css:
+    app_dash.css.append_css({"external_url": css})
+
+
+app_dash.layout = local_layout
+local_callbacks(app_dash)
 
 def get_file_path():
     CONFIG_FILE_PATH = './config.txt'
@@ -37,20 +50,20 @@ def get_file_path():
 
 if __name__ == '__main__':
     print("hello")
-    app.run(port=8080)
+    server.run(port=8080, debug=True)
 
 
-@app.route('/')
+@server.route('/')
 def hello_world():
     return render_template('drpdn-search.html')
 
 
-@app.route('/search')
+@server.route('/search')
 def search():
     return render_template('query-page.html')
 
 
-@app.route('/result', methods=('GET', 'POST'))
+@server.route('/result', methods=('GET', 'POST'))
 def show_result():
     if request.method == 'POST':
         caption_id = request.form['query']
@@ -64,7 +77,7 @@ def show_result():
     return render_template('query-page.html')
 
 
-@app.route('/search-drop', methods=('GET', 'POST'))
+@server.route('/search-drop', methods=('GET', 'POST'))
 def search_dropdown():
     print("in search by dropdown")
     if request.method == 'POST':
