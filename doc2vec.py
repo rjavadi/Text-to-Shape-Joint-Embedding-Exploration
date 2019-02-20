@@ -56,7 +56,7 @@ def find_similars(query):
     return model.docvecs.most_similar([vec_emb])
 
 
-def create_embedding_datafram():
+def create_embedding_dataframe():
     model = Doc2Vec.load(get_model_path())
     docs = model.docvecs.vectors_docs
 
@@ -73,5 +73,10 @@ def create_embedding_datafram():
 
 
 # train_and_save()
-create_embedding_datafram()
+# create_embedding_dataframe()
 
+
+# labels_df = pd.read_csv(get_labels_path())
+# emb_df = pd.read_csv(get_embedding_path())
+# emb_df['category'] = labels_df['category']
+# emb_df.to_csv('categorized_doc2vec_emb.csv', index=False)

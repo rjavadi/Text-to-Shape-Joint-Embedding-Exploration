@@ -14,23 +14,6 @@ from local import local_callbacks, local_layout
 import doc2vec
 
 server = Flask(__name__)
-app_dash = dash.Dash(__name__, server=server)
-
-print("name: ", __name__)
-
-external_css = [
-    "https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css",
-    "https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css",
-    "//fonts.googleapis.com/css?family=Raleway:400,300,600",
-    "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
-]
-
-for css in external_css:
-    app_dash.css.append_css({"external_url": css})
-
-
-app_dash.layout = local_layout
-local_callbacks(app_dash)
 
 def get_file_path():
     CONFIG_FILE_PATH = './config.txt'
@@ -50,6 +33,7 @@ def get_file_path():
 
 if __name__ == '__main__':
     print("hello")
+    # app_dash.run_server(debug=True)
     server.run(port=8080, debug=True)
 
 

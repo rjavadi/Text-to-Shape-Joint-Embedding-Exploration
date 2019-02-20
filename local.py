@@ -49,16 +49,59 @@ def input_field(title, state_id, state_value, state_max, state_min):
     ]
     )
 
+
+def merge(a, b):
+    return dict(a, **b)
+
+
+def omit(omitted_keys, d):
+    return {k: v for k, v in d.items() if k not in omitted_keys}
+
+
+def Card(children, **kwargs):
+    return html.Section(
+        children,
+        style=merge({
+            'padding': 20,
+            'margin': 5,
+            'borderRadius': 5,
+            'border': 'thin lightgrey solid',
+
+            # Remove possibility to select the text for better UX
+            'user-select': 'none',
+            '-moz-user-select': 'none',
+            '-webkit-user-select': 'none',
+            '-ms-user-select': 'none'
+        }, kwargs.get('style', {})),
+        **omit(['style'], kwargs)
+    )
+
+
 # Generate the default scatter plot
-tsne_df = pd.read_csv("data/tsne_3d.csv", index_col=0)
+# tsne_df = pd.read_csv("data/tsne_3d.csv", index_col=0)
+data_df = pd.read_csv("doc2vec_emb.csv", index_col=0)
+label_df = pd.read_csv("labels.csv")
+pca = PCA(n_components=24)
+data_pca = pca.fit_transform(data_df)
+tsne = TSNE(n_components=3,
+            perplexity=25,
+            learning_rate=300,
+            n_iter=500)
+data_tsne = tsne.fit_transform(data_pca)
+tsne_data_df = pd.DataFrame(data_tsne, columns=['x', 'y', 'z'])
+
+# label_df.columns = ['category']
+
+# combined_df = tsne_data_df.join(label_df)
+tsne_data_df['category'] = label_df['category']
 
 data = []
 
-for idx, val in tsne_df.groupby(tsne_df.index):
-    idx = int(idx)
+for idx, val in tsne_data_df.groupby('category'):
+    # idx = int(idx)
 
     scatter = go.Scatter3d(
-        name=f"Digit {idx}",
+        name=idx,
         x=val['x'],
         y=val['y'],
         z=val['z'],
@@ -69,7 +112,6 @@ for idx, val in tsne_df.groupby(tsne_df.index):
         )
     )
     data.append(scatter)
-
 
 # Layout for the t-SNE graph
 tsne_layout = go.Layout(
@@ -150,7 +192,7 @@ local_layout = html.Div([
             className="eight columns"
         ),
 
-        html.Div([
+        Card([
 
             html.H4(
                 't-SNE Parameters',
@@ -230,6 +272,7 @@ local_layout = html.Div([
                     'margin-top': '2px'
                 }
             )
+
         ],
             className="four columns",
             style={
@@ -244,7 +287,20 @@ local_layout = html.Div([
                 '-webkit-user-select': 'none',
                 '-ms-user-select': 'none'
             }
-        )
+        ),
+        html.Div(className="four columns", children=[
+            Card(style={'padding': '5px'}, children=[
+                html.Div(id='div-plot-click-message',
+                         style={'text-align': 'center',
+                                'margin-bottom': '7px',
+                                'font-weight': 'bold'}
+                         ),
+
+                html.Div(id='div-plot-click-image'),
+
+                html.Div(id='div-plot-click-wordemb')
+            ])
+        ])
     ],
         className="row"
     ),
@@ -392,8 +448,8 @@ def local_callbacks(app):
             start_time = time.time()
 
             # Apply PCA on the data first
-            # pca = PCA(n_components=pca_dim)
-            pca = PCA(n_components=3)
+            pca = PCA(n_components=pca_dim)
+            # pca = PCA(n_components=3)
             data_pca = pca.fit_transform(data_df)
             # Roya TODO: we need these values
             print(pca.singular_values_)
@@ -405,12 +461,12 @@ def local_callbacks(app):
                         n_iter=n_iter)
 
             try:
-                # data_tsne = tsne.fit_transform(data_pca)
-                # kl_divergence = tsne.kl_divergence_
-                kl_divergence = 0.34
+                data_tsne = tsne.fit_transform(data_pca)
+                kl_divergence = tsne.kl_divergence_
+                # kl_divergence = 0.34
 
                 # Combine the reduced t-sne data with its label
-                tsne_data_df = pd.DataFrame(data_pca, columns=['x', 'y', 'z'])
+                tsne_data_df = pd.DataFrame(data_tsne, columns=['x', 'y', 'z'])
 
                 label_df.columns = ['label']
 
