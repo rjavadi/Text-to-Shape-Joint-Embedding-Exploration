@@ -37,7 +37,8 @@ def input_field(title, state_id, state_value, state_max, state_min):
                 value=state_value,
                 max=state_max,
                 min=state_min,
-                size=7
+                size=7,
+                disabled=True
             )
         ],
             style={
@@ -94,6 +95,7 @@ tsne_data_df = pd.DataFrame(data_tsne, columns=['x', 'y', 'z'])
 
 # combined_df = tsne_data_df.join(label_df)
 tsne_data_df['category'] = label_df['category']
+tsne_data_df['modelId'] = label_df['modelId']
 
 data = []
 
@@ -105,6 +107,7 @@ for idx, val in tsne_data_df.groupby('category'):
         x=val['x'],
         y=val['y'],
         z=val['z'],
+        customdata=val['modelId'],
         mode='markers',
         marker=dict(
             size=2.5,
@@ -199,13 +202,13 @@ local_layout = html.Div([
                 id='tsne_h4'
             ),
 
-            input_field("Perplexity:", "perplexity-state", 20, 50, 5),
+            input_field("Perplexity:", "perplexity-state", tsne.perplexity, 50, 5),
 
-            input_field("Number of Iterations:", "n-iter-state", 400, 1000, 250),
+            input_field("Number of Iterations:", "n-iter-state", tsne.n_iter, 1000, 250),
 
-            input_field("Learning Rate:", "lr-state", 200, 1000, 10),
+            input_field("Learning Rate:", "lr-state", tsne.learning_rate, 1000, 10),
 
-            input_field("Initial PCA dimensions:", "pca-state", 30, 10000, 3),
+            input_field("Initial PCA dimensions:", "pca-state", pca.n_components, 10000, 3),
 
             html.Button(
                 id='tsne-train-button',
@@ -305,17 +308,6 @@ local_layout = html.Div([
         className="row"
     ),
 
-    html.Div([
-        dcc.Markdown('''
-This is the local version of the t-SNE explorer. To view the source code, please visit the 
-[GitHub Repository](https://github.com/plotly/dash-tsne). 
-To view pre-generated simulations of t-SNE, check out the [demo app](https://dash-tsne.herokuapp.com). 
-''')],
-        style={
-            'margin-top': '15px'
-        },
-        className="row"
-    )
 ],
     className="container",
     style={
