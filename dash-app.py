@@ -20,7 +20,7 @@ external_css = [
 for css in external_css:
     app_dash.css.append_css({"external_url": css})
 
-
+app_dash.config.suppress_callback_exceptions = True
 app_dash.layout = local_layout
 local_callbacks(app_dash)
 
