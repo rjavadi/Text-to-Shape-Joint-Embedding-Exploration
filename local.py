@@ -16,7 +16,12 @@ from dash.dependencies import Input, Output, State
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from textwrap import dedent as d
+import configparser
 
+def get_captions_path():
+    config = configparser.ConfigParser()
+    config.read('config.txt')
+    return config['DEFAULT']['CaptionsFilePath']
 
 
 def input_field(title, state_id, state_value, state_max, state_min):
@@ -83,7 +88,7 @@ def Card(children, **kwargs):
 # Generate the default scatter plot
 # tsne_df = pd.read_csv("data/tsne_3d.csv", index_col=0)
 data_df = pd.read_csv("doc2vec_emb.csv", index_col=0)
-label_df = pd.read_csv("labels.csv")
+label_df = pd.read_csv("new_labels.csv")
 pca = PCA(n_components=24)
 data_pca = pca.fit_transform(data_df)
 tsne = TSNE(n_components=3,
@@ -98,6 +103,7 @@ tsne_data_df = pd.DataFrame(data_tsne, columns=['x', 'y', 'z'])
 # combined_df = tsne_data_df.join(label_df)
 tsne_data_df['category'] = label_df['category']
 tsne_data_df['modelId'] = label_df['modelId']
+tsne_data_df['captionId'] = label_df['id']
 
 data = []
 
@@ -110,7 +116,7 @@ for idx, val in tsne_data_df.groupby('category'):
         y=val['y'],
         z=val['z'],
         customdata=val['modelId'],
-
+        text=val['captionId'],
         mode='markers',
         marker=dict(
             size=2.5,
@@ -197,64 +203,49 @@ local_layout = html.Div([
             id="plot-div",
             className="eight columns"
         ),
-
-        Card([
-
-            html.H4(
-                't-SNE Parameters',
-                id='tsne_h4'
-            ),
-
-            input_field("Perplexity:", "perplexity-state", tsne.perplexity, 50, 5),
-
-            input_field("Number of Iterations:", "n-iter-state", tsne.n_iter, 1000, 250),
-
-            input_field("Learning Rate:", "lr-state", tsne.learning_rate, 1000, 10),
-
-            input_field("Initial PCA dimensions:", "pca-state", pca.n_components, 10000, 3),
-
-            html.Div([
-                html.P(id='upload-data-message',
-                       style={
-                           'margin-bottom': '0px'
-                       }),
-
-                html.P(id='upload-label-message',
-                       style={
-                           'margin-bottom': '0px'
-                       }),
-
-                html.Div(id='training-status-message',
-                         style={
-                             'margin-bottom': '0px',
-                             'margin-top': '0px'
-                         }),
-
-                html.P(id='error-status-message')
-            ],
-                id='output-messages',
-                style={
-                    'margin-bottom': '2px',
-                    'margin-top': '2px'
-                }
-            )
-
-        ],
-            className="four columns",
-            style={
-                'padding': 20,
-                'margin': 5,
-                'borderRadius': 5,
-                'border': 'thin lightgrey solid',
-
-                # Remove possibility to select the text for better UX
-                'user-select': 'none',
-                '-moz-user-select': 'none',
-                '-webkit-user-select': 'none',
-                '-ms-user-select': 'none'
-            }
-        ),
         html.Div(className="four columns", children=[
+            Card([
+
+                html.H4(
+                    't-SNE Parameters',
+                    id='tsne_h4'
+                ),
+
+                input_field("Perplexity:", "perplexity-state", tsne.perplexity, 50, 5),
+
+                input_field("Number of Iterations:", "n-iter-state", tsne.n_iter, 1000, 250),
+
+                input_field("Learning Rate:", "lr-state", tsne.learning_rate, 1000, 10),
+
+                input_field("Initial PCA dimensions:", "pca-state", pca.n_components, 10000, 3),
+
+                html.Div([
+                    html.P(id='upload-data-message',
+                           style={
+                               'margin-bottom': '0px'
+                           }),
+
+                    html.P(id='upload-label-message',
+                           style={
+                               'margin-bottom': '0px'
+                           }),
+
+                    html.Div(id='training-status-message',
+                             style={
+                                 'margin-bottom': '0px',
+                                 'margin-top': '0px'
+                             }),
+
+                    html.P(id='error-status-message')
+                ],
+                    id='output-messages',
+                    style={
+                        'margin-bottom': '2px',
+                        'margin-top': '2px'
+                    }
+                )
+
+            ]),
             Card(style={'padding': '5px'}, children=[
                 html.Div(id='div-plot-click-message',
                          style={'text-align': 'center',
@@ -263,14 +254,14 @@ local_layout = html.Div([
                          ),
 
                 html.Div([
-            dcc.Markdown(d("""
+                    dcc.Markdown(d("""
                 **Click Data**
 
                 Click on points in the graph.
             """)),
 
-        ], id="click-data", style={'text-align': 'center',
-                                'margin-bottom': '7px'}),
+                ], id="click-data", style={'text-align': 'center',
+                                           'margin-bottom': '7px'}),
 
                 html.Div(id='div-plot-click-wordemb')
             ])
@@ -334,10 +325,12 @@ def local_callbacks(app):
         Output('click-data', 'children'),
         [Input('tsne-3d-plot', 'clickData')])
     def display_click_data(clickData):
-        print("%%%%%%%%%%%%%%%%%" , clickData)
+        print("%%%%%%%%%%%%%%%%%", clickData)
         modelId = clickData['points'][0]['customdata']
         # return json.dumps(clickData, indent=2)
-        return html.Img(src="http://dovahkiin.stanford.edu/scene-toolkit/assets/download/3dw/image/" + modelId  + "/rotatingImage", width=100, height=100)
+        return html.Img(
+            src="http://dovahkiin.stanford.edu/scene-toolkit/assets/download/3dw/image/" + modelId + "/rotatingImage",
+            width=100, height=100)
 
     # Updated graph --> Training status message
     @app.callback(Output('training-status-message', 'children'),
@@ -358,6 +351,49 @@ def local_callbacks(app):
                 html.P(f"Final KL-Divergence: {kl_divergence:.2f}",
                        style={'margin-bottom': '0px'})
             ]
+
+    @app.callback(Output('div-plot-click-wordemb', 'children'),
+                  [Input('tsne-3d-plot', 'clickData')])
+    def display_click_word_neighbors(clickData):
+        if clickData:
+            caption_id = clickData['points'][0]['text']
+            captions_df = pd.read_csv(get_captions_path(), usecols=['id', 'description', 'modelId'], index_col='id')
+            text = captions_df.loc[caption_id]['description']
+
+            # Get the nearest neighbors indices using Euclidean distance
+            # vector = data_dict[dataset].set_index('0')
+            # selected_vec = vector.loc[selected_word]
+
+            # def compare_pd(vector):
+                # return spatial_distance.euclidean(vector, selected_vec)
+
+            # distance_map = vector.apply(compare_pd, axis=1)
+            # nearest_neighbors = distance_map.sort_values()[1:6]
+
+            # trace = go.Bar(
+            #     x=nearest_neighbors.values,
+            #     y=nearest_neighbors.index,
+            #     width=0.5,
+            #     orientation='h'
+            # )
+
+            # layout = go.Layout(
+            #     title=f'5 nearest neighbors of "{selected_word}"',
+            #     xaxis=dict(title='Euclidean Distance'),
+            #     margin=go.Margin(l=60, r=60, t=35, b=35)
+            # )
+            #
+            # fig = go.Figure(data=[trace], layout=layout)
+            #
+            return dcc.Graph(
+                id='graph-bar-nearest-neighbors-word',
+                figure=fig,
+                style={'height': '25vh'},
+                config={'displayModeBar': False}
+            )
+
+        else:
+            return None
 
     @app.callback(Output('error-status-message', 'children'),
                   [Input('error-message', 'children')])

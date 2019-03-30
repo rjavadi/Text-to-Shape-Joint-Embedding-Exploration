@@ -1,5 +1,5 @@
 [DEFAULT]
-CaptionsFilePath = F:\DL-code\text2shape-data\captions.csv
+CaptionsFilePath = C:\Roya\DL-code\text2shape-data\captions.csv
 CaptionsDoc2VecModel = .\captions_emb.doc2vec
 EmbeddingsCsv=.\categorized_doc2vec_emb.csv
-LabelsCsv=.\labels.csv
+LabelsCsv=.\new_labels.csv
