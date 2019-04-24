@@ -16,6 +16,7 @@ from dash.dependencies import Input, Output, State
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from textwrap import dedent as d
+from ast import literal_eval
 import configparser
 
 def get_captions_path():
@@ -87,23 +88,26 @@ def Card(children, **kwargs):
 
 # Generate the default scatter plot
 # tsne_df = pd.read_csv("data/tsne_3d.csv", index_col=0)
-data_df = pd.read_csv("doc2vec_emb.csv", index_col=0)
+data_df = pd.read_csv("embeddings_with_text.csv")
 label_df = pd.read_csv("new_labels.csv")
-pca = PCA(n_components=24)
-data_pca = pca.fit_transform(data_df)
+pca = PCA(n_components=32)
+
+float64_series = data_df['embeddings'].apply(literal_eval)
+float64_df = float64_series.apply(pd.Series)
+data_pca = pca.fit_transform(float64_df)
 tsne = TSNE(n_components=3,
-            perplexity=25,
+            perplexity=50,
             learning_rate=300,
-            n_iter=500)
+            n_iter=400)
 data_tsne = tsne.fit_transform(data_pca)
 tsne_data_df = pd.DataFrame(data_tsne, columns=['x', 'y', 'z'])
 
 # label_df.columns = ['category']
 
 # combined_df = tsne_data_df.join(label_df)
-tsne_data_df['category'] = label_df['category']
-tsne_data_df['modelId'] = label_df['modelId']
-tsne_data_df['captionId'] = label_df['id']
+tsne_data_df['category'] = data_df['synsetId']
+tsne_data_df['modelId'] = data_df['modelId']
+tsne_data_df['captionId'] = data_df['caption']
 
 data = []
 

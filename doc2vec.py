@@ -2,6 +2,7 @@ from gensim.test.utils import common_texts, get_tmpfile
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from gensim import similarities, models
 from gensim.utils import simple_preprocess
+import scipy.spatial.distance as spatial_distance
 import configparser
 import pandas as pd
 
@@ -50,7 +51,7 @@ def train_and_save():
 
 
 def find_similars(query):
-    # // TODO: if model file not exists, train and save it.
+    # TODO: if model file not exists, train and save it.
     model = Doc2Vec.load(get_model_path())
     vec_emb = model.infer_vector(query.lower().split())
     return model.docvecs.most_similar([vec_emb])
@@ -77,6 +78,12 @@ def create_embedding_dataframe():
 
 
 # labels_df = pd.read_csv(get_labels_path())
-# emb_df = pd.read_csv(get_embedding_path())
-# emb_df['category'] = labels_df['category']
-# emb_df.to_csv('categorized_doc2vec_emb.csv', index=False)
+# new_labels_df = pd.read_csv(get_captions_path(), usecols=['id', 'category', 'modelId'], index_col='id')
+# labels_df.drop(columns='captionId', inplace=True)
+# new_labels_df['id'] = captions_df['id']
+# new_labels_df['category'] = captions_df['category']
+# new_labels_df['modelId'] = captions_df['modelId']
+
+# labels_df['captionId'] = str(captions_df['id'])
+# csv = new_labels_df.to_csv('new_labels.csv')
+# print('saved file')

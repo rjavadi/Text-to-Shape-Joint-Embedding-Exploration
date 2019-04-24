@@ -2,9 +2,11 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
+import re
 from tensorflow.contrib.tensorboard.plugins import projector
 import os
 from PIL import Image
+
 
 img_h = img_w = 40
 
@@ -37,6 +39,13 @@ def get_images(img_dir):
             path = os.path.join(img_dir, name)
             img_data.append(np.array(Image.open(path)))
     return img_data
+
+
+def add_comma(liststr):
+    newlist = re.sub("\s+", ", ", liststr)
+    newlist = newlist.replace("[,", "[")
+    newlist = newlist.replace(",]", "[")
+    return newlist
 
 
 def write_sprite_image(filename, images):
