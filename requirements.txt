@@ -31,7 +31,7 @@ numpy==1.15.3
 pandas==0.23.4
 pefile==2018.8.8
 Pillow==5.3.0
-protobuf==3.6.1
+protobuf==3.15.0
 PyInstaller==3.4
 pyparsing==2.2.2
 python-dateutil==2.7.3
